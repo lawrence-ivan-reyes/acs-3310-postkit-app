@@ -1,120 +1,86 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { PostList } from './components/PostList'
+import { samplePosts } from './data/samplePosts'
+import { filterByStatus, sortByDate, sortByTitle } from 'postkit-filter-sort'
+import { SearchInput } from 'postkit-ui-component-library'
+import type { Post, PostStatus } from './types'
+
+// TODO: Replace with postkit-search-library when fixed (ESM/CJS mismatch)
+function searchPosts(posts: Post[], query: string): Post[] {
+  if (!query.trim()) return posts
+  const q = query.toLowerCase()
+  return posts.filter(p => 
+    p.title.toLowerCase().includes(q) || 
+    p.body.toLowerCase().includes(q) ||
+    p.tags.some(t => t.toLowerCase().includes(q))
+  )
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [statusFilter, setStatusFilter] = useState<PostStatus | 'all'>('all')
+  const [sortBy, setSortBy] = useState<'date' | 'title'>('date')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+  const [searchQuery, setSearchQuery] = useState('')
+
+  let filteredPosts = [...samplePosts]
+  filteredPosts = searchPosts(filteredPosts, searchQuery)
+  if (statusFilter !== 'all') {
+    filteredPosts = filterByStatus(filteredPosts, statusFilter)
+  }
+  filteredPosts = sortBy === 'date' 
+    ? sortByDate(filteredPosts, sortDir) 
+    : sortByTitle(filteredPosts, sortDir)
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="max-w-3xl mx-auto p-5">
+      <header className="text-center py-10">
+        <h1 className="text-4xl font-bold text-gray-900">PostKit</h1>
+        <p className="mt-2 text-gray-500">A lightweight content publishing tool</p>
+      </header>
 
-      <div className="ticks"></div>
+      <main>
+        <h2 className="text-xl font-semibold mb-4">Your Posts</h2>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div className="flex flex-wrap gap-3 mb-4">
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search posts..."
+            debounceMs={300}
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as PostStatus | 'all')}
+            className="px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer"
+          >
+            <option value="all">All Statuses</option>
+            <option value="draft">Draft</option>
+            <option value="review">Review</option>
+            <option value="published">Published</option>
+          </select>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'date' | 'title')}
+            className="px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer"
+          >
+            <option value="date">Sort by Date</option>
+            <option value="title">Sort by Title</option>
+          </select>
+          <button
+            onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+            className="px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:bg-gray-50"
+          >
+            {sortDir === 'asc' ? '↑ Asc' : '↓ Desc'}
+          </button>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <p className="text-sm text-gray-500 mb-4">
+          Showing {filteredPosts.length} of {samplePosts.length} posts
+        </p>
+
+        <PostList posts={filteredPosts} />
+      </main>
+    </div>
   )
 }
 
