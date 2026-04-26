@@ -4,75 +4,67 @@ import { formatRelativeDate } from 'postkit-date-status-display'
 import { readingTime, formatTime } from 'postkit-reading-time'
 import { createExcerpt } from 'postkit-excerpt'
 import { createSlugFromTitle } from 'postkit-slug'
+import { getTagColor } from '../constants'
 
-const statusStyles: Record<string, string> = {
-  draft: 'bg-gray-100 text-gray-600',
-  review: 'bg-amber-100 text-amber-700',
-  published: 'bg-green-100 text-green-700',
+const PAPERS = ['bg-yellow-50', 'bg-amber-50', 'bg-orange-50', 'bg-lime-50', 'bg-sky-50']
+const TAPES = [
+  { color: 'bg-amber-300/90', pos: '-top-3 left-6 -rotate-12' },
+  { color: 'bg-sky-300/90', pos: '-top-3 right-8 rotate-6' },
+  { color: 'bg-pink-300/90', pos: '-top-3 left-1/3 -rotate-6' },
+  { color: 'bg-lime-300/90', pos: '-top-3 right-1/4 rotate-12' },
+  { color: 'bg-purple-300/90', pos: '-top-3 left-10 rotate-3' },
+]
+const OFFSETS = ['ml-0', 'ml-8', 'ml-2', 'ml-12', 'ml-4']
+const TILTS = ['-rotate-[0.5deg]', 'rotate-[0.8deg]', '-rotate-[0.3deg]', 'rotate-[0.5deg]', '-rotate-[1deg]']
+const STATUS_LABELS: Record<string, { icon: string; text: string }> = {
+  draft: { icon: '', text: 'todo' },
+  review: { icon: '~', text: 'in progress' },
+  published: { icon: '✓', text: 'done' },
 }
 
-const statusLabels: Record<string, string> = {
-  draft: 'Draft',
-  review: 'In Review',
-  published: 'Published',
-}
-
-export function PostList({ posts }: { posts: Post[] }) {
-  if (posts.length === 0) {
-    return (
-      <div className="text-center py-16">
-        <div className="text-6xl mb-4">📝</div>
-        <p className="text-gray-500">No posts yet. Create your first one!</p>
-      </div>
-    )
-  }
+export function PostList({ posts, allTags }: { posts: Post[]; allTags: string[] }) {
+  if (!posts.length) return <div className="py-16 text-center"><p className="text-stone-500 italic">Nothing here yet...</p></div>
 
   return (
-    <div className="space-y-3">
-      {posts.map((post) => {
-        const slug = createSlugFromTitle(post.title)
-        const initial = post.author.charAt(0).toUpperCase()
-        
-        return (
-          <Link
-            key={post.id}
-            to={`/posts/${slug}`}
-            className="block bg-white rounded-2xl p-4 hover:bg-gray-50 transition-colors border border-gray-100"
-          >
-            <div className="flex gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-semibold shrink-0">
-                {initial}
-              </div>
+    <div className="p-8 rounded-xl" style={{ backgroundColor: '#b8956e', backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E")` }}>
+      <div className="space-y-6">
+        {posts.map((post, i) => {
+          const tape = TAPES[i % TAPES.length]
+          const status = STATUS_LABELS[post.status]
+          return (
+            <Link key={post.id} to={`/posts/${createSlugFromTitle(post.title)}`}
+              className={`${PAPERS[i % PAPERS.length]} ${OFFSETS[i % OFFSETS.length]} ${TILTS[i % TILTS.length]} relative block max-w-lg hover:shadow-lg transition-shadow duration-150`}
+              style={{ boxShadow: '1px 2px 6px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.1)', backgroundImage: 'repeating-linear-gradient(transparent, transparent 27px, #e5e5e5 28px)' }}>
               
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-gray-900">{post.author}</span>
-                  <span className="text-gray-400">·</span>
-                  <span className="text-gray-400 text-sm">{formatRelativeDate(post.updatedAt)}</span>
-                  <span className={`ml-auto px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[post.status]}`}>
-                    {statusLabels[post.status]}
-                  </span>
+              <div className={`${tape.color} ${tape.pos} absolute w-14 h-5 rounded-sm`} style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }} />
+              
+              {i % 3 === 0 && <div className="absolute bottom-0 right-0 w-8 h-8" style={{ background: 'linear-gradient(135deg, transparent 50%, #d4d4d4 50%, #e5e5e5 60%, #f5f5f5 100%)' }} />}
+              
+              <div className="p-5 pt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="inline-flex items-center justify-center w-4 h-4 border-2 border-stone-400 rounded-sm text-[10px]">{status.icon}</span>
+                  <span className="text-xs text-stone-500 font-mono">{status.text}</span>
                 </div>
+
+                <h3 className="text-xl font-semibold text-stone-800 mb-1 leading-snug"><span className="border-b-2 border-stone-800">{post.title}</span></h3>
+                <p className="text-[11px] text-stone-400 mb-3 italic">~{formatTime(readingTime(post.body))} read</p>
+                <p className="text-sm text-stone-600 mb-4 leading-relaxed">{createExcerpt(post.body, 100)}</p>
                 
-                <h3 className="font-semibold text-gray-900 mb-1">{post.title}</h3>
-                <p className="text-gray-500 text-sm line-clamp-2">{createExcerpt(post.body, 120)}</p>
+                {post.tags.length > 0 && (
+                  <div className="flex gap-2 mb-4 flex-wrap">
+                    {post.tags.slice(0, 3).map(t => <span key={t} className={`${getTagColor(t, allTags).highlight} px-1.5 py-0.5 text-xs rounded`}>{t}</span>)}
+                  </div>
+                )}
                 
-                <div className="flex items-center gap-3 mt-2 text-sm text-gray-400">
-                  <span>{formatTime(readingTime(post.body))} read</span>
-                  {post.tags.length > 0 && (
-                    <div className="flex gap-1">
-                      {post.tags.slice(0, 3).map((tag) => (
-                        <span key={tag} className="text-purple-500">#{tag}</span>
-                      ))}
-                      {post.tags.length > 3 && <span>+{post.tags.length - 3}</span>}
-                    </div>
-                  )}
+                <div className="flex items-center justify-between text-xs text-stone-500 pt-2">
+                  <span className="italic">— {post.author}</span>
+                  <span>{formatRelativeDate(post.updatedAt)}</span>
                 </div>
               </div>
-            </div>
-          </Link>
-        )
-      })}
+            </Link>
+          )
+        })}
+      </div>
     </div>
   )
 }

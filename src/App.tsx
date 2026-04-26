@@ -4,7 +4,7 @@ import { PostEditorView } from './views/PostEditorView'
 
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50">
+    <div className="min-h-screen">
       <Routes>
         <Route path="/" element={<PostListView />} />
         <Route path="/posts/new" element={<PostEditorView />} />
