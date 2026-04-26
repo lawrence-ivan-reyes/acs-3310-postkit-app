@@ -1,6 +1,6 @@
 # PostKit
 
-A lightweight content management tool for managing blog posts.
+A content management tool for managing blog posts.
 
 ## Features
 
