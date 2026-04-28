@@ -1,12 +1,11 @@
 import type { Post } from '../types'
 
-// Sample hardcoded posts for testing
 export const samplePosts: Post[] = [
   {
     id: '1',
     title: 'Getting Started with PostKit',
     body: 'PostKit is a lightweight content publishing tool for writers who manage multiple posts in different states of completion. This guide will walk you through the basics of creating and managing your posts. You can write, organize, and move posts through a workflow from draft to published.',
-    author: 'Ivan',
+    author: 'Mitchell',
     tags: ['tutorial', 'getting-started'],
     category: 'Documentation',
     status: 'published',
@@ -28,11 +27,25 @@ export const samplePosts: Post[] = [
     id: '3',
     title: 'Building React Components',
     body: 'React components are the building blocks of any React application. Learn how to create reusable, composable components that follow best practices. We will cover functional components, hooks, props, and state management patterns.',
-    author: 'Ivan',
+    author: 'Dani',
     tags: ['react', 'javascript', 'components'],
     category: 'Development',
     status: 'review',
     createdAt: '2026-04-17T16:00:00Z',
     updatedAt: '2026-04-19T08:00:00Z',
   },
+  {
+    id: '4',
+    title: 'React Hooks',
+    body: 'React hooks are a new feature that allows you to use state and other React features without writing a class. We will cover the basics of hooks, how to use them, and when to use them.',
+    author: 'Braus',
+    tags: ['react', 'hooks'],
+    category: 'Development',
+    status: 'published',
+    createdAt: '2026-04-17T16:00:00Z',
+    updatedAt: '2026-04-19T08:00:00Z',
+  },  
+  
+    
+
 ]
