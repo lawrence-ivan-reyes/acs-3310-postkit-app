@@ -114,7 +114,7 @@ export function PostListView() {
           {allTags.length > 0 && (
             <div className={PANEL}>
               <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">Tags</h3>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
                 {allTags.map((tag, i) => {
                   const c = TAG_COLORS[i % TAG_COLORS.length]
                   const sel = selectedTags.includes(tag)
