@@ -80,4 +80,57 @@ describe('postStore', () => {
       expect(tags).toEqual(['react', 'testing', 'vitest'])
     })
   })
+
+  describe('publishedAt', () => {
+    it('sets publishedAt when creating a post with published status', () => {
+      usePostStore.getState().addPost({
+        title: 'Published Post',
+        body: 'Content',
+        author: 'Author',
+        tags: [],
+        category: 'General',
+        status: 'published',
+      })
+
+      const post = usePostStore.getState().posts[0]
+      expect(post.publishedAt).toBeTruthy()
+      expect(post.publishedAt).toBe(post.createdAt)
+    })
+
+    it('sets publishedAt to null when creating a draft post', () => {
+      usePostStore.getState().addPost({
+        title: 'Draft Post',
+        body: 'Content',
+        author: 'Author',
+        tags: [],
+        category: 'General',
+        status: 'draft',
+      })
+
+      const post = usePostStore.getState().posts[0]
+      expect(post.publishedAt).toBeNull()
+    })
+
+    it('sets publishedAt when updating a draft to published', () => {
+      const draftPost = makePost({ status: 'draft', publishedAt: null })
+      usePostStore.setState({ posts: [draftPost] })
+
+      usePostStore.getState().updatePost(draftPost.id, { status: 'published' })
+
+      const updatedPost = usePostStore.getState().posts[0]
+      expect(updatedPost.publishedAt).toBeTruthy()
+      expect(updatedPost.status).toBe('published')
+    })
+
+    it('preserves publishedAt when updating a published post', () => {
+      const originalPublishedAt = '2026-01-01T00:00:00Z'
+      const publishedPost = makePost({ status: 'published', publishedAt: originalPublishedAt })
+      usePostStore.setState({ posts: [publishedPost] })
+
+      usePostStore.getState().updatePost(publishedPost.id, { title: 'Updated Title' })
+
+      const updatedPost = usePostStore.getState().posts[0]
+      expect(updatedPost.publishedAt).toBe(originalPublishedAt)
+    })
+  })
 })

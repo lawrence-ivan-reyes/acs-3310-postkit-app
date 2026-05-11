@@ -26,17 +26,24 @@ export const usePostStore = create<PostStore>()(
           id: crypto.randomUUID(),
           createdAt: now,
           updatedAt: now,
+          publishedAt: postData.status === 'published' ? now : null,
         }
         set((state) => ({ posts: [...state.posts, newPost] }))
       },
 
       updatePost: (id, updates) => {
         set((state) => ({
-          posts: state.posts.map((post) =>
-            post.id === id
-              ? { ...post, ...updates, updatedAt: new Date().toISOString() }
-              : post
-          ),
+          posts: state.posts.map((post) => {
+            if (post.id !== id) return post
+            const now = new Date().toISOString()
+            const isBecomingPublished = updates.status === 'published' && post.status !== 'published'
+            return {
+              ...post,
+              ...updates,
+              updatedAt: now,
+              publishedAt: isBecomingPublished ? now : post.publishedAt,
+            }
+          }),
         }))
       },
 

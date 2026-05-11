@@ -11,6 +11,7 @@ export const samplePosts: Post[] = [
     status: 'published',
     createdAt: '2026-04-15T10:00:00Z',
     updatedAt: '2026-04-18T14:30:00Z',
+    publishedAt: '2026-04-18T14:30:00Z',
   },
   {
     id: '2',
@@ -44,6 +45,7 @@ export const samplePosts: Post[] = [
     status: 'published',
     createdAt: '2026-04-17T16:00:00Z',
     updatedAt: '2026-04-19T08:00:00Z',
+    publishedAt: '2026-04-19T08:00:00Z',
   },  
   
     

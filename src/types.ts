@@ -13,4 +13,5 @@ export type Post = {
   status: PostStatus
   createdAt: string
   updatedAt: string
+  publishedAt?: string | null
 }

@@ -55,7 +55,11 @@ export function PostEditorView() {
   const previewSlug = title.trim() ? createSlugFromTitle(title) : '...'
   const previewExcerpt = body.trim() ? createExcerpt(body, 80) : '...'
   const previewReadTime = body.trim() ? formatTime(readingTime(body)) : '...'
-  const previewDate = existingPost ? formatRelativeDate(existingPost.updatedAt) : 'Now'
+  const isPublished = existingPost?.status === 'published'
+  const previewDate = existingPost
+    ? formatRelativeDate(isPublished && existingPost.publishedAt ? existingPost.publishedAt : existingPost.updatedAt)
+    : 'Now'
+  const previewDateLabel = isPublished ? 'Published' : 'Updated'
 
   const inputClass = "w-full px-4 py-2.5 bg-white border-2 border-stone-800 rounded-lg focus:outline-none focus:border-teal-600"
 
@@ -135,7 +139,7 @@ export function PostEditorView() {
                   <p className="font-bold">{previewReadTime}</p>
                 </div>
                 <div className="bg-white/20 rounded-lg p-3 text-center">
-                  <span className="text-white/60 text-xs block">Updated</span>
+                  <span className="text-white/60 text-xs block">{previewDateLabel}</span>
                   <p className="font-bold">{previewDate}</p>
                 </div>
               </div>

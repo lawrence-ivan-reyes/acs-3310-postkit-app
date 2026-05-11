@@ -4,6 +4,8 @@ let counter = 0
 
 export function makePost(overrides: Partial<Post> = {}): Post {
   counter++
+  const status = overrides.status ?? 'draft'
+  const now = new Date().toISOString()
   return {
     id: `post-${counter}`,
     title: `Test Post ${counter}`,
@@ -11,9 +13,10 @@ export function makePost(overrides: Partial<Post> = {}): Post {
     author: 'Test Author',
     tags: ['test'],
     category: 'General',
-    status: 'draft',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    status,
+    createdAt: now,
+    updatedAt: now,
+    publishedAt: status === 'published' ? now : null,
     ...overrides,
   }
 }
